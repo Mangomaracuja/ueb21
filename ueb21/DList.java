@@ -6,6 +6,7 @@ import Exceptions.DListException;
  * Klasse DList. Verwaltet eine doppelt verkettete Liste mit Personen.
  *
  * @author Manuel Jung; Alexander Stolz
+ * @param <T>
  */
 public class DList<T> {
 
@@ -23,12 +24,10 @@ public class DList<T> {
      * Konstruktor der Klasse PersonenListe, mit initialisierung der einzelnen
      * Attribute.
      *
-     * @param head Anfang der Liste.
-     * @param tail Ende der Liste.
      */
-    public DList(ListNode<T> head, ListNode<T> tail) {
-        this.head = head;
-        this.tail = tail;
+    public DList() {
+        this.head = null;
+        this.tail = null;
         this.size = 0;
     }
 
@@ -37,7 +36,7 @@ public class DList<T> {
      *
      * @param index Der Index des Element, welches zurückgegeben Werden soll.
      */
-    private ListNode entry(int index) throws DListException {
+    private ListNode<T> entry(int index) throws DListException {
         if (size == 0) {
             throw new DListException(MSG_LIST_EMPTY);
         }
@@ -45,7 +44,7 @@ public class DList<T> {
             throw new DListException(MSG_INDEX_RANGE);
         }
 
-        ListNode pn = head;
+        ListNode<T> pn = head;
 
         for (int i = 0; i < index; i++) {
             pn = pn.getNext();
@@ -59,14 +58,15 @@ public class DList<T> {
      *
      * @param index
      * @param neu
+     * @throws Exceptions.DListException
      */
-    private void addIndex(int index, T neu) throws DListException {
+    public void addIndex(int index, T neu) throws DListException {
         if (neu == null) 
             throw new DListException(MSG_NULL_REFERENZE);
         if (index < 0 || index > size)
             throw new DListException(MSG_INDEX_RANGE);
         
-        ListNode pn;
+        ListNode<T> pn;
         ListNode<T> newpn = new ListNode<>(neu, null, null);
 
         if (head == null && tail == null) {
@@ -94,7 +94,7 @@ public class DList<T> {
      * Wert in die Liste einfuegen
      *
      * @param neu Einzifügendes Element.
-     * @throws u17_1.Exceptions.DListException
+     * @throws Exceptions.DListException
      */
     public void add(T neu) throws DListException {
         if (neu == null) {
@@ -103,35 +103,8 @@ public class DList<T> {
         if (contains(neu)) {
             throw new DListException(MSG_ALLREADY_EXISTS);
         }
-
-        int index = findNextBigger(neu);
-        addIndex(index, neu);
-    }
-
-    /**
-     * Sucht den Index an den das neue Element geschoben werden kann.
-     *
-     * @param p Das Objekt für das geprüft wird an welche stelle es Passt.
-     * @return Der index an den das neue Element geschoben werden kann.
-     */
-    private int findNextBigger(T p) throws DListException {
-        if (p == null)
-            throw new DListException(MSG_NULL_REFERENZE);
         
-        ListNode pn = head;
-        int i;
-
-        for (i = 0; i < size; i++) {
-            if (pn.getPerson().getVorname().compareTo(p.getVorname()) > 0) {
-                return i;
-            } else if (pn.getPerson().getNachname().compareTo(p.getNachname()) > 0) {
-                return i;
-            } else {
-                pn = pn.getNext();
-            }
-        }
-
-        return i;
+        addIndex(size, neu);
     }
 
     /**
@@ -146,18 +119,18 @@ public class DList<T> {
     /**
      * Enthaelt die Liste das Objekt?
      *
-     * @param p zu suchender Wert
+     * @param t
      * @return
-     * @throws u17_1.Exceptions.DListException
+     * @throws Exceptions.DListException
      */
-    public boolean contains(Person p) throws DListException {
-        if (p == null)
+    public boolean contains(T t) throws DListException {
+        if (t == null)
             throw new DListException(MSG_NULL_REFERENZE);
         
-        ListNode pn = head;
+        ListNode<T> pn = head;
 
         for (int i = 0; i < size; i++) {
-            if (pn.getPerson().equals(p)) {
+            if (pn.getItem().equals(t)) {
                 return true;
             }
             pn = pn.getNext();
@@ -171,61 +144,61 @@ public class DList<T> {
      *
      * @param index Stelle an dem das Objekt zu suchen ist.
      * @return Elemetn welches zu suchen war.
-     * @throws u17_1.Exceptions.DListException
+     * @throws Exceptions.DListException
      */
-    public Person get(int index) throws DListException {
+    public T get(int index) throws DListException {
         if (size == 0) 
             throw new DListException(MSG_LIST_EMPTY);
         if (index < 0 || index >= size)
             throw new DListException(MSG_INDEX_RANGE);
         
-        return entry(index).getPerson();
+        return entry(index).getItem();
     }
 
     /**
      * Wert des ersten Elements zurueckgeben
      *
      * @return Erstes Element.
-     * @throws u17_1.Exceptions.DListException
+     * @throws Exceptions.DListException
      */
-    public Person getFirst() throws DListException {
+    public T getFirst() throws DListException {
         if (size == 0) 
             throw new DListException(MSG_LIST_EMPTY);
         
-        return head.getPerson();
+        return head.getItem();
     }
 
     /**
      * Wert des letzten Elements zurueckgeben
      *
      * @return Letztes Element.
-     * @throws u17_1.Exceptions.DListException
+     * @throws Exceptions.DListException
      */
-    public Person getLast() throws DListException {
+    public T getLast() throws DListException {
         if (size == 0)
             throw new DListException(MSG_LIST_EMPTY);
-        return tail.getPerson();
+        return tail.getItem();
     }
 
     /**
      * An welcher Stelle steht das Objekt?
      *
-     * @param p das zu suchende Objekt
+     * @param t
      * @return den Index des Objektes oder -1
-     * @throws u17_1.Exceptions.DListException
+     * @throws Exceptions.DListException
      */
-    public int indexOf(Person p) throws DListException {
+    public int indexOf(T t) throws DListException {
         if (size == 0)
             throw new DListException(MSG_LIST_EMPTY);
-        if (p == null)
+        if (t == null)
             throw new DListException(MSG_NULL_REFERENZE);
-        if (!contains(p)) {
+        if (!contains(t)) {
             throw new DListException(MSG_NOT_IN_LIST);
         }
-        ListNode pn = head;
+        ListNode<T> pn = head;
 
         for (int i = 0; i < size; i++) {
-            if (pn.getPerson().equals(p)) {
+            if (pn.getItem().equals(t)) {
                 return i;
             }
             pn = pn.getNext();
@@ -239,7 +212,7 @@ public class DList<T> {
      *
      * @param pn zu loeschendes Listenelement
      */
-    private void remove(ListNode pn) throws DListException {
+    private void remove(ListNode<T> pn) throws DListException {
         if (pn == null) 
             throw new DListException(MSG_NULL_REFERENZE);
         
@@ -260,7 +233,7 @@ public class DList<T> {
      * Lösche Element an der Stelle index
      *
      * @param index Der Index dessen zugehöriges Objekt zu löschen ist.
-     * @throws u17_1.Exceptions.DListException
+     * @throws Exceptions.DListException
      */
     public void remove(int index) throws DListException {
         if (size == 0)
@@ -273,29 +246,29 @@ public class DList<T> {
             tail = null;
             size--;
         } else {
-            ListNode pn;
-            pn = entry(index);
-            remove(pn);
+            ListNode<T> ln;
+            ln = entry(index);
+            remove(ln);
         }
     }
 
     /**
      * Entferne Element mit einem bestimmten Inhalt
      *
-     * @param p Das zu entferndende Objekt.
-     * @throws u17_1.Exceptions.DListException
+     * @param t
+     * @throws Exceptions.DListException
      */
-    public void remove(Person p) throws DListException {
+    public void remove(T t) throws DListException {
         if (size == 0)
             throw new DListException(MSG_LIST_EMPTY);
-        if (p == null) 
+        if (t == null) 
             throw new DListException(MSG_NULL_REFERENZE);
-        remove(indexOf(p));
+        remove(indexOf(t));
     }
 
     /**
      * Das erste Element löschen
-     * @throws u17_1.Exceptions.DListException
+     * @throws Exceptions.DListException
      */
     public void removeFirst() throws DListException {
         if (size == 0)
@@ -305,7 +278,7 @@ public class DList<T> {
 
     /**
      * Das letzte Element löschen
-     * @throws u17_1.Exceptions.DListException
+     * @throws Exceptions.DListException
      */
     public void removeLast() throws DListException {
         if (size == 0)
@@ -331,10 +304,10 @@ public class DList<T> {
     public String toString() {
         StringBuilder sb = new StringBuilder("Elemente in der Liste:\n");
         sb.append("===================================\n");
-        ListNode pn = head;
+        ListNode<T> pn = head;
         
         for (int i = 0; i < size; i++) {
-            sb.append(String.format("%2d: %s", i, pn.getPerson().toString()));
+            sb.append(String.format("%2d: %s", i, pn.getItem().toString()));
             pn = pn.getNext();
         }
         

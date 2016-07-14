@@ -26,12 +26,12 @@ public class ListNode<T> {
         this.next = next;
     }
 
-    public T getPerson() {
+    public T getItem() {
         return item;
     }
 
-    public void setPerson(T person) {
-        this.item = person;
+    public void setItem(T item) {
+        this.item = item;
     }
 
     public ListNode getPrev() {
