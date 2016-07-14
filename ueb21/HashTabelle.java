@@ -14,19 +14,19 @@ public class HashTabelle<K, T> {
     private static final String MSG_NOSUCHELEMENT = " Element existiert nicht";
     private static final String MSG_ALREADYEXISTS = " Element existiert nicht";
 
-    private DList<HashElement<K, T>> tabelle[];
+    private final ArrayList<HashElement<K, T>> tabelle[];
 
     public HashTabelle(int size){
-        tabelle = new DList[size];
+        tabelle = new ArrayList[size];
         for(int i=0;i<size;i++){
-            tabelle[i] = new DList<HashElement<K,T>>();
+            tabelle[i] = new ArrayList<>();
         }
 
     }
     
     public void insert(K key, T wert) throws DListException{
         int hash = hashing(key);
-        tabelle[hash].add(new HashElement<K, T>(key, wert));
+        tabelle[hash].add(new HashElement<>(key, wert));
     }
 
     public void insertValue(K key, T wert){
