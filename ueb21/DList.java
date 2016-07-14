@@ -1,6 +1,7 @@
 package ueb21;
 
 import Exceptions.DListException;
+import java.util.Iterator;
 
 /**
  * Klasse DList. Verwaltet eine doppelt verkettete Liste mit Personen.
@@ -8,7 +9,7 @@ import Exceptions.DListException;
  * @author Manuel Jung; Alexander Stolz
  * @param <T>
  */
-public class DList<T> {
+public class DList<T> implements Iterable{
 
     private static final String MSG_LIST_EMPTY = "Liste ist leer!";
     private static final String MSG_INDEX_RANGE = "Der index ist nicht im zulässigem Bereich!";
@@ -29,6 +30,18 @@ public class DList<T> {
         this.head = null;
         this.tail = null;
         this.size = 0;
+    }
+
+    /**
+     * ein Aufzaehlungsobjekt zurueckgeben, mit dem über die Liste iteriert
+     * werden kann
+     * @return 
+     */
+    @Override
+    public Iterator iterator() {
+        DListItr<T> itr;
+        itr = new DListItr<>(head);
+        return itr;
     }
 
     /**
@@ -61,11 +74,13 @@ public class DList<T> {
      * @throws Exceptions.DListException
      */
     public void addIndex(int index, T neu) throws DListException {
-        if (neu == null) 
+        if (neu == null) {
             throw new DListException(MSG_NULL_REFERENZE);
-        if (index < 0 || index > size)
+        }
+        if (index < 0 || index > size) {
             throw new DListException(MSG_INDEX_RANGE);
-        
+        }
+
         ListNode<T> pn;
         ListNode<T> newpn = new ListNode<>(neu, null, null);
 
@@ -103,7 +118,7 @@ public class DList<T> {
         if (contains(neu)) {
             throw new DListException(MSG_ALLREADY_EXISTS);
         }
-        
+
         addIndex(size, neu);
     }
 
@@ -124,9 +139,10 @@ public class DList<T> {
      * @throws Exceptions.DListException
      */
     public boolean contains(T t) throws DListException {
-        if (t == null)
+        if (t == null) {
             throw new DListException(MSG_NULL_REFERENZE);
-        
+        }
+
         ListNode<T> pn = head;
 
         for (int i = 0; i < size; i++) {
@@ -147,11 +163,13 @@ public class DList<T> {
      * @throws Exceptions.DListException
      */
     public T get(int index) throws DListException {
-        if (size == 0) 
+        if (size == 0) {
             throw new DListException(MSG_LIST_EMPTY);
-        if (index < 0 || index >= size)
+        }
+        if (index < 0 || index >= size) {
             throw new DListException(MSG_INDEX_RANGE);
-        
+        }
+
         return entry(index).getItem();
     }
 
@@ -162,9 +180,10 @@ public class DList<T> {
      * @throws Exceptions.DListException
      */
     public T getFirst() throws DListException {
-        if (size == 0) 
+        if (size == 0) {
             throw new DListException(MSG_LIST_EMPTY);
-        
+        }
+
         return head.getItem();
     }
 
@@ -175,8 +194,9 @@ public class DList<T> {
      * @throws Exceptions.DListException
      */
     public T getLast() throws DListException {
-        if (size == 0)
+        if (size == 0) {
             throw new DListException(MSG_LIST_EMPTY);
+        }
         return tail.getItem();
     }
 
@@ -188,10 +208,12 @@ public class DList<T> {
      * @throws Exceptions.DListException
      */
     public int indexOf(T t) throws DListException {
-        if (size == 0)
+        if (size == 0) {
             throw new DListException(MSG_LIST_EMPTY);
-        if (t == null)
+        }
+        if (t == null) {
             throw new DListException(MSG_NULL_REFERENZE);
+        }
         if (!contains(t)) {
             throw new DListException(MSG_NOT_IN_LIST);
         }
@@ -213,9 +235,10 @@ public class DList<T> {
      * @param pn zu loeschendes Listenelement
      */
     private void remove(ListNode<T> pn) throws DListException {
-        if (pn == null) 
+        if (pn == null) {
             throw new DListException(MSG_NULL_REFERENZE);
-        
+        }
+
         if (pn == head) {
             head.getNext().setPrev(null);
             head = head.getNext();
@@ -236,11 +259,13 @@ public class DList<T> {
      * @throws Exceptions.DListException
      */
     public void remove(int index) throws DListException {
-        if (size == 0)
+        if (size == 0) {
             throw new DListException(MSG_LIST_EMPTY);
-        if (index < 0 || index >= size)
+        }
+        if (index < 0 || index >= size) {
             throw new DListException(MSG_INDEX_RANGE);
-        
+        }
+
         if (head == tail) {
             head = null;
             tail = null;
@@ -259,31 +284,37 @@ public class DList<T> {
      * @throws Exceptions.DListException
      */
     public void remove(T t) throws DListException {
-        if (size == 0)
+        if (size == 0) {
             throw new DListException(MSG_LIST_EMPTY);
-        if (t == null) 
+        }
+        if (t == null) {
             throw new DListException(MSG_NULL_REFERENZE);
+        }
         remove(indexOf(t));
     }
 
     /**
      * Das erste Element löschen
+     *
      * @throws Exceptions.DListException
      */
     public void removeFirst() throws DListException {
-        if (size == 0)
+        if (size == 0) {
             throw new DListException(MSG_LIST_EMPTY);
+        }
         remove(0);
     }
 
     /**
      * Das letzte Element löschen
+     *
      * @throws Exceptions.DListException
      */
     public void removeLast() throws DListException {
-        if (size == 0)
+        if (size == 0) {
             throw new DListException(MSG_LIST_EMPTY);
-        remove(size-1);
+        }
+        remove(size - 1);
     }
 
     /**
@@ -305,14 +336,14 @@ public class DList<T> {
         StringBuilder sb = new StringBuilder("Elemente in der Liste:\n");
         sb.append("===================================\n");
         ListNode<T> pn = head;
-        
+
         for (int i = 0; i < size; i++) {
             sb.append(String.format("%2d: %s", i, pn.getItem().toString()));
             pn = pn.getNext();
         }
-        
+
         sb.append("===================================\n");
-        
+
         return sb.toString();
     }
 }

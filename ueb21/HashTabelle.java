@@ -1,5 +1,6 @@
 package ueb21;
 
+import Exceptions.DListException;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
@@ -13,17 +14,17 @@ public class HashTabelle<K, T> {
     private static final String MSG_NOSUCHELEMENT = " Element existiert nicht";
     private static final String MSG_ALREADYEXISTS = " Element existiert nicht";
 
-    private ArrayList<HashElement<K, T>> tabelle[];
+    private DList<HashElement<K, T>> tabelle[];
 
     public HashTabelle(int size){
-        tabelle = new ArrayList[size];
+        tabelle = new DList[size];
         for(int i=0;i<size;i++){
-            tabelle[i] = new ArrayList<HashElement<K,T>>();
+            tabelle[i] = new DList<HashElement<K,T>>();
         }
 
     }
     
-    public void insert(K key, T wert){
+    public void insert(K key, T wert) throws DListException{
         int hash = hashing(key);
         tabelle[hash].add(new HashElement<K, T>(key, wert));
     }
@@ -39,7 +40,7 @@ public class HashTabelle<K, T> {
     public HashElement get(K key){
         int hash = hashing(key);
 
-        for (HashElement<K,T> he: tabelle[hash]) {
+        for (HashElement<K,T> he : tabelle[hash]) {
             if(he.getKey().equals(key)){
                return he;
             }
@@ -51,7 +52,7 @@ public class HashTabelle<K, T> {
         int hash = hashing(key);
         T erg = null;
 
-        for (HashElement<K,T> he: tabelle[hash]) {
+        for (HashElement<K,T> he : tabelle[hash]) {
             if(he.getKey().equals(key)){
                 erg = he.getWert();
                 return erg;
