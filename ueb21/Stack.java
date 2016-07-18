@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ueb21;
 
 import Exceptions.StackException;
@@ -10,7 +5,7 @@ import java.lang.reflect.Array;
 
 /**
  *
- * @author manuel
+ * @author Manuel Jung; Alexander Stolz; Niklas Reinhard;
  * @param <T>
  */
 public class Stack<T> {

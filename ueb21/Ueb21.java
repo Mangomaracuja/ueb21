@@ -1,5 +1,7 @@
 package ueb21;
 
+import Exceptions.DListException;
+import Exceptions.IONotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.FileNotFoundException;
@@ -9,7 +11,7 @@ import java.util.regex.*;
 
 /**
  *
- * @author Manuel Jung; Alexander Stolz
+ * @author Manuel Jung; Alexander Stolz; Niklas Reinhard;
  */
 public class Ueb21 {
 
@@ -71,12 +73,12 @@ public class Ueb21 {
      * @return file Rückgabewert der Datei
      * @throws DListIOException
      */
-    private File getFile(String filename) throws IOException {
+    private File getFile(String filename) throws IOException, IONotFoundException {
         File file = new File(filename);
         if (!file.exists()) {
-            throw new IOException(MSG_NOT_FOUND);
+            throw new IONotFoundException(MSG_NOT_FOUND);
         } else if (!file.isFile()) {
-            throw new IOException(MSG_NO_FILE);
+            throw new IONotFoundException(MSG_NO_FILE);
         } else if (!file.canRead()) {
             throw new IOException(MSG_NOT_READ);
         }
@@ -118,7 +120,7 @@ public class Ueb21 {
      *
      * @param zeile
      */
-    private void analyzeLine(String zeile) {
+    private void analyzeLine(String zeile) throws DListException {
         Pattern r = Pattern.compile(regex);
         Matcher m = r.matcher(zeile);
         if (zeile.contains(EQUALS)) {

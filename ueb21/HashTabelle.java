@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 
 /**
  *
- * @author manuel
+ * @author Manuel Jung; Alexander Stolz; Niklas Reinhard;
  * @param <K>
  * @param <T>
  */

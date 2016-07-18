@@ -2,7 +2,7 @@ package ueb21;
 
 /**
  *
- * @author manuel
+ * @author Manuel Jung; Alexander Stolz; Niklas Reinhard;
  */
 public class ExpressionTree {
     private final TreeNode head;
