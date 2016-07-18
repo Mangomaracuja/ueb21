@@ -1,6 +1,7 @@
 package ueb21;
 
 import Exceptions.DListException;
+import Exceptions.IdentifierException;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
@@ -12,7 +13,7 @@ import java.util.NoSuchElementException;
  */
 public class HashTabelle<K, T> {
     private static final String MSG_NOSUCHELEMENT = " Element existiert nicht";
-    private static final String MSG_ALREADYEXISTS = " Element existiert nicht";
+    private static final String MSG_ALREADYEXISTS = " Element existiert bereits";
 
     private final ArrayList<HashElement<K, T>> tabelle[];
 
@@ -24,17 +25,22 @@ public class HashTabelle<K, T> {
 
     }
     
-    public void insert(K key, T wert) throws DListException{
+    public void insert(K key, T wert) throws DListException, IdentifierException{
+        if(get(key) != null) 
+            throw new IdentifierException(MSG_ALREADYEXISTS);
         int hash = hashing(key);
         tabelle[hash].add(new HashElement<>(key, wert));
     }
 
-    public void insertValue(K key, T wert){
+    public void insertValue(K key, T wert) throws IdentifierException{
         int hash = hashing(key);
-        if(get(key) == null) {
-            //exception ELementAlreadyExists
-        }
+        if(get(key) == null) 
+            throw new IdentifierException(MSG_NOSUCHELEMENT);
         get(key).setWert(wert);
+    }
+    
+    public void insertKey(K key) throws IdentifierException, DListException{
+        insert(key, null);
     }
 
     public HashElement get(K key){

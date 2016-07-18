@@ -2,11 +2,13 @@ package ueb21;
 
 import Exceptions.DListException;
 import Exceptions.IONotFoundException;
+import Exceptions.IdentifierException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.LineNumberReader;
 import java.io.File;
+import java.util.Scanner;
 import java.util.regex.*;
 
 /**
@@ -23,17 +25,24 @@ public class Ueb21 {
     private static final String MSG_NAME_NOT_FOUND = "Element konnte nicht gefunden werden";
     private static final String MSG_NO_FILE = "Ist keine einfache Datei!";
     private static final String MSG_NOT_READ = "Datei ist nicht lesbar";
+    private static final String MSG_LINE_MISSING = "Erwartete Leerzeile fehlt!";
+    private static final String MSG_UNKNOWN_IDENTIFIER = "Identifier Unbekannt!";
+    private static final String DATEIEINGABE = "Name der Eingabedatei oder Return-Taste zum Beenden => ";
+    private static final String RESULT = "Ergebnis: ";
     private static final String EQUALS = " = ";
-    private static final String regex = "(.+?)\\s=\\s(.+?)";
+    private static final String REGEX = "(.+?)\\s=\\s(.+?)";
 
-    private ExpressionTree tree;
+    private final ExpressionTree tree;
     private HashTabelle<String, Integer> table;
+    
+    Scanner scanner;
 
     /**
      * Standartkonstruktor
      */
     private Ueb21() {
         this.tree = new ExpressionTree();
+        scanner = new Scanner(System.in);
     }
 
     /**
@@ -42,20 +51,18 @@ public class Ueb21 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        if (args.length <= 0) {
-            System.out.println(MSG_NO_ARGUMENTS);
-            System.exit(1);
-        }
-        new Ueb21().start(args);
+        new Ueb21().start();
     }
 
     /**
      * Start-Methode
      *
      */
-    private void start(String[] args) {
+    private void start() {
         try {
-            File file = getFile(args[0]);
+            File file = getFile();
+            System.out.println("\n" + file);
+            createTable(file);
             analyzeFile(file);
         } catch (IOException e) {
             System.out.println(e);
@@ -65,7 +72,7 @@ public class Ueb21 {
             System.exit(1);
         }
     }
-
+    
     /**
      * Funktion zum Auswerten der übergebenen Datei.
      *
@@ -73,7 +80,9 @@ public class Ueb21 {
      * @return file Rückgabewert der Datei
      * @throws DListIOException
      */
-    private File getFile(String filename) throws IOException, IONotFoundException {
+    private File getFile() throws IOException, IONotFoundException {
+        System.out.print(DATEIEINGABE);
+        String filename = scanner.next();
         File file = new File(filename);
         if (!file.exists()) {
             throw new IONotFoundException(MSG_NOT_FOUND);
@@ -84,6 +93,22 @@ public class Ueb21 {
         }
         return file;
     }
+    
+    /**
+     * Zählt die Zeilen in denen die Identifier Deklariert werden und erstell
+     * dann eine Hashtabelle mit passender Länge.
+     * 
+     * @param file 
+     */
+    private void createTable(File file) throws FileNotFoundException, IOException {
+        int size = 0;
+        FileReader fr = new FileReader(file);
+        LineNumberReader lnr = new LineNumberReader(fr);
+        while(!lnr.readLine().isEmpty()){
+            size++;
+        }
+        this.table = new HashTabelle(size);
+    }
 
     /**
      * Funktion zum Auswerten von der Datei. Fängt Exceptions eventueller
@@ -93,22 +118,37 @@ public class Ueb21 {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private void analyzeFile(File file) throws FileNotFoundException, IOException {
-        int size = 0;
+    private void analyzeFile(File file) throws FileNotFoundException, IOException, IdentifierException, DListException {
+        int linenr = 0;
         FileReader fr = new FileReader(file);
         LineNumberReader lnr = new LineNumberReader(fr);
         String line;
+        
+        do{
+            line = lnr.readLine();
+            line = line.trim();
+            table.insertKey(line);
+            linenr++;
+        } while (!line.isEmpty());
+        
+        line = lnr.readLine();
+        linenr++;
+        tree.generateTree(line, table);
+        System.out.println(line + "\n");
+        display();
+        if(!lnr.readLine().isEmpty())
+            throw new IOException(MSG_LINE_MISSING + linenr);
+        
         while ((line = lnr.readLine()) != null) {
             System.out.println(line);
             try {
                 line = line.trim();
                 analyzeLine(line);
-                size++;
+                linenr++;
             } catch (Exception e) {
                 System.out.println(e);
             }
         }
-        this.table = new HashTabelle(size);
     }
 
     /**
@@ -120,14 +160,21 @@ public class Ueb21 {
      *
      * @param zeile
      */
-    private void analyzeLine(String zeile) throws DListException {
-        Pattern r = Pattern.compile(regex);
+    private void analyzeLine(String zeile) throws DListException, IdentifierException {
+        if (zeile.isEmpty()){
+            System.out.println(RESULT + tree.calculate());
+            display();
+            return;
+        }
+        Pattern r = Pattern.compile(REGEX);
         Matcher m = r.matcher(zeile);
         if (zeile.contains(EQUALS)) {
-            String name = m.group(1);
-            String key = m.group(2);
-            int wert = Integer.valueOf(key);
-            table.insert(name, wert);
+            String key = m.group(1);
+            if(table.get(key) != null)
+                throw new IdentifierException(MSG_UNKNOWN_IDENTIFIER + key);
+            
+            int value = Integer.parseInt(m.group(2));
+            table.insertValue(key, value);
         }
     }
 
@@ -136,6 +183,6 @@ public class Ueb21 {
      *
      */
     private void display() {
-        tree.toString();
+        System.out.println(tree.toString() + "\n");
     }
 }
