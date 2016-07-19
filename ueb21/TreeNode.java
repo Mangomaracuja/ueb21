@@ -1,47 +1,65 @@
 package ueb21;
 
 /**
- *
- * @author Manuel Jung; Alexander Stolz; Niklas Reinhard;
+ * Created by niklasreinhard on 18/07/16.
  */
-public class TreeNode {
-
+public class TreeNode<T> {
+    private T key;
     private TreeNode left;
     private TreeNode right;
-    private String key;
 
-    public TreeNode(String key) {
+
+    public TreeNode(T key) {
         this.key = key;
-        this.left = null;
-        this.right = null;
+    }
+
+    public TreeNode(T key, TreeNode left, TreeNode right) {
+        this.key = key;
+        this.left = left;
+        this.right = right;
+    }
+
+    public TreeNode() {
+    }
+
+    public T getKey() {
+        return key;
     }
 
     public TreeNode getLeft() {
         return left;
     }
 
-    public void setLeft(TreeNode left) {
-        this.left = left;
-    }
-
     public TreeNode getRight() {
         return right;
     }
 
-    public void setRight(TreeNode right) {
+    public void setKey(T key){
+        this.key = key;
+    }
+
+    public void setLeft(TreeNode<T> left){
+        this.left = left;
+    }
+
+    public void setRight(TreeNode<T> right){
         this.right = right;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
+    /* checks if current TreeNode is Leaf*/
+    public boolean isLeaf(){
+        if(this.left == null && this.right == null){
+            return true;
+        }
+        return false;
     }
 
     @Override
     public String toString() {
-        return null;
+        return "Node{" +
+                "key=" + key +
+                ", left=" + left +
+                ", right=" + right +
+                '}';
     }
 }
