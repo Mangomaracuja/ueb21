@@ -4,6 +4,7 @@ import Exceptions.DListException;
 import Exceptions.IONotFoundException;
 import Exceptions.IdentifierException;
 import Exceptions.NoValueInHashTableException;
+import Exceptions.StackException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.FileNotFoundException;
@@ -119,7 +120,7 @@ public class Ueb21 {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private void analyzeFile(File file) throws FileNotFoundException, IOException, IdentifierException, DListException, NoValueInHashTableException {
+    private void analyzeFile(File file) throws FileNotFoundException, IOException, IdentifierException, DListException, NoValueInHashTableException, StackException {
         int linenr = 0;
         FileReader fr = new FileReader(file);
         LineNumberReader lnr = new LineNumberReader(fr);

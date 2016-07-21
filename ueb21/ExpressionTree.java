@@ -1,5 +1,6 @@
 package ueb21;
 
+import Exceptions.IdentifierException;
 import Exceptions.NoValueInHashTableException;
 import Exceptions.StackException;
 import java.util.NoSuchElementException;
@@ -7,39 +8,26 @@ import java.util.NoSuchElementException;
 /**
  * Created by niklasreinhard on 18/07/16.
  *
- * @param <T>
+ * 
  */
-public class ExpressionTree<T> {
+public class ExpressionTree {
+
+    private static final String MSG_UNKNOWN_IDENTIFIER = "Identifier Unbekannt!";
 
     private HashTabelle<String, Integer> table;
-
-    /*
-
-    Sample usage:
-
-     ExpressionTree<String> expTree = new ExpressionTree<String>(new TreeNode("Test"));
-        expTree.insertLeft(expTree.getRoot(), new TreeNode("Test2"));
-        expTree.insertRight(expTree.getRoot(), new TreeNode("Test3"));
-        expTree.printInOrder(expTree.getRoot());
-
-     */
-    private TreeNode<T> root;
-
-    public ExpressionTree(TreeNode<T> root) {
-        this.table = new HashTabelle(10);
-        this.root = root;
-    }
+    private TreeNode root;
 
     public ExpressionTree() {
+        this.root = null;
     }
 
-    public TreeNode<T> getRoot() {
+    public TreeNode getRoot() {
         return this.root;
     }
 
     /* inserts new TreeNode 'left' as left child of node*/
  /* returns left TreeNode*/
-    public TreeNode<T> insertLeft(TreeNode<T> node, TreeNode<T> left) {
+    public TreeNode insertLeft(TreeNode node, TreeNode left) {
         if (this.root == null) {
             root = left;
         }
@@ -51,7 +39,7 @@ public class ExpressionTree<T> {
 
     /* inserts new TreeNode 'right' as right child of node*/
  /* returns right TreeNode*/
-    public TreeNode<T> insertRight(TreeNode<T> node, TreeNode<T> right) {
+    public TreeNode insertRight(TreeNode node, TreeNode right) {
         if (this.root == null) {
             root = right;
         } else {
@@ -60,16 +48,7 @@ public class ExpressionTree<T> {
         return right;
     }
 
-    /* prints Tree inOrder left-root-right*/
-    public void printInOrder(TreeNode localRoot) {
-        if (localRoot != null) {
-            printInOrder(localRoot.getLeft());
-            System.out.println(localRoot.toString());
-            printInOrder(localRoot.getRight());
-        }
-    }
-
-    public void insert(TreeNode<T> node) {
+    public void insert(TreeNode node) {
         if (root == null) {
             root = node;
         } else {
@@ -105,39 +84,57 @@ public class ExpressionTree<T> {
      * @throws Exceptions.NoValueInHashTableException
      * @throws Exceptions.StackException
      */
-    public void generateTree(String ausdruck, HashTabelle tb) throws NoValueInHashTableException, StackException {
+    public void generateTree(String ausdruck, HashTabelle tb) throws NoValueInHashTableException, StackException, IdentifierException {
         this.table = tb;
         /* parse String into operands and operators*/
         String[] parse = ausdruck.split(" ");
 
         Stack<String> optStack = new Stack(String.class, 100);
         Stack<TreeNode> opndStack = new Stack(TreeNode.class, 100);
+        TreeNode newNode;
 
         for (String s : parse) {
-            if (checkOperand(s)) {
-                TreeNode newNode = new TreeNode(s);
-                insert(newNode);
+            if (!checkOperator(s)) {
+                if (tb.get(s) == null) {
+                    throw new IdentifierException(MSG_UNKNOWN_IDENTIFIER + s);
+                }
+                newNode = new TreeNode(s);
                 opndStack.push(newNode);
-            } else if (optStack.empty()) {
-                optStack.push(s);
-            } else {
+            } else if (s.equals("(")) {
+                optStack.push("(");
+            } else if (s.equals(")")) {
                 while (!optStack.empty()) {
                     String opTop = optStack.pop();
                     if (opTop.equals("(")) {
-                        optStack.push(s);
-                    } else if (opTop.compareTo(s) < 0) { //to do schreibe eigene compare 
-                        optStack.push(s);
-                    } else {
-                        TreeNode opTopKnoten = new TreeNode(s);
-                        opTopKnoten.setRight(opndStack.pop());
-                        opTopKnoten.setLeft(opndStack.pop());
-                        opndStack.push(opTopKnoten);
-                    }
-                    if (opTop.equals("(") || opTop.compareTo(s) < 0) {
                         break;
+                    } else {
+                        newNode = new TreeNode(opTop);
+                        newNode.setRight(opndStack.pop());
+                        newNode.setLeft(opndStack.pop());
+                        opndStack.push(newNode);
                     }
                 }
-                optStack.push(s);
+            } else if (checkOperator(s)) {
+                if (optStack.empty()) {
+                    optStack.push(s);
+                } else {
+                    while (!optStack.empty()) {
+                        String opTop = optStack.pop();
+                        if (opTop.equals("(")) {
+                            optStack.push(opTop);
+                            break;
+                        } else if (compareTo(opTop, s) < 0) {
+                            optStack.push(opTop);
+                            break;
+                        } else {
+                            newNode = new TreeNode(opTop);
+                            newNode.setRight(opndStack.pop());
+                            newNode.setLeft(opndStack.pop());
+                            opndStack.push(newNode);
+                        }
+                    }
+                    optStack.push(s);
+                }
             }
         }
 
@@ -148,7 +145,30 @@ public class ExpressionTree<T> {
             opTopKnoten.setLeft(opndStack.pop());
             opndStack.push(opTopKnoten);
         }
+        
+        root = opndStack.pop();
 
+        //            else if (optStack.empty()) {
+        //                optStack.push(s);
+        //            } else {
+        //                while (!optStack.empty()) {
+        //                    String opTop = optStack.pop();
+        //                    if (opTop.equals("(")) {
+        //                        optStack.push(s);
+        //                    } else if (opTop.compareTo(s) < 0) { //to do schreibe eigene compare 
+        //                        optStack.push(s);
+        //                    } else {
+        //                        TreeNode opTopKnoten = new TreeNode(s);
+        //                        opTopKnoten.setRight(opndStack.pop());
+        //                        opTopKnoten.setLeft(opndStack.pop());
+        //                        opndStack.push(opTopKnoten);
+        //                    }
+        //                    if (opTop.equals("(") || opTop.compareTo(s) < 0) {
+        //                        break;
+        //                    }
+        //                }
+        //                optStack.push(s);
+        //            }
     }
 
     private int zuweisenPrioritaet(String str) {
@@ -200,8 +220,8 @@ public class ExpressionTree<T> {
 //            System.out.println(checkOperand(s));
 //        }
 //    }
-    private boolean checkOperand(String s) {
-        return !(s.equals("+") || s.equals("-") || s.equals("/") || s.equals("*") || s.equals("(") || s.equals(")"));
+    private boolean checkOperator(String s) {
+        return (s.equals("+") || s.equals("-") || s.equals("/") || s.equals("*"));
     }
 
 //    private void checkOperands(String[] operands) throws NoValueInHashTableException{
@@ -222,5 +242,24 @@ public class ExpressionTree<T> {
      */
     public double calculate() {
         return 0.0;
+    }
+    
+    @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        TreeNode node = root;
+        while (node.getLeft() != null) {
+            node = node.getLeft();
+            sb.append("|  ");
+            i++;
+        }
+        sb.append("+--");
+        sb.append(table.get(node.getKey()).toString());
+        sb.append("\n");
+        for(;i>0;i--) sb.append("|  ");
+        
+        
+        return sb.toString();
     }
 }

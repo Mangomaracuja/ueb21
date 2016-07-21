@@ -1,19 +1,22 @@
 package ueb21;
 
 /**
- * Created by niklasreinhard on 18/07/16.
+ * 
+ * 
+ * @author Manuel Jung; Alexander Stolz; Niklas Reinhard;
+ * 
  */
-public class TreeNode<T> {
-    private T key;
+public class TreeNode {
+    private String key;
     private TreeNode left;
     private TreeNode right;
 
 
-    public TreeNode(T key) {
+    public TreeNode(String key) {
         this.key = key;
     }
 
-    public TreeNode(T key, TreeNode left, TreeNode right) {
+    public TreeNode(String key, TreeNode left, TreeNode right) {
         this.key = key;
         this.left = left;
         this.right = right;
@@ -22,7 +25,7 @@ public class TreeNode<T> {
     public TreeNode() {
     }
 
-    public T getKey() {
+    public String getKey() {
         return key;
     }
 
@@ -34,15 +37,15 @@ public class TreeNode<T> {
         return right;
     }
 
-    public void setKey(T key){
+    public void setKey(String key){
         this.key = key;
     }
 
-    public void setLeft(TreeNode<T> left){
+    public void setLeft(TreeNode left){
         this.left = left;
     }
 
-    public void setRight(TreeNode<T> right){
+    public void setRight(TreeNode right){
         this.right = right;
     }
 

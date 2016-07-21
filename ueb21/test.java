@@ -3,13 +3,14 @@ package ueb21;
 import Exceptions.DListException;
 import Exceptions.IdentifierException;
 import Exceptions.NoValueInHashTableException;
+import Exceptions.StackException;
 
 /**
  * Created by niklasreinhard on 18/07/16.
  */
 public class test {
-    public static void main(String[] args) throws DListException, IdentifierException, NoValueInHashTableException {
-        ExpressionTree<String> expTree = new ExpressionTree<>();
+    public static void main(String[] args) throws DListException, IdentifierException, NoValueInHashTableException, StackException {
+        ExpressionTree expTree = new ExpressionTree();
         /*expTree.insertLeft(expTree.getRoot(), new TreeNode("Test2"));
         expTree.insertRight(expTree.getRoot(), new TreeNode("Test3"));
         expTree.printInOrder(expTree.getRoot());*/
@@ -22,7 +23,7 @@ public class test {
         
         expTree.generateTree("hallo + ficken", ht);
       
-        expTree.printInOrder(expTree.getRoot());
+        System.out.print(expTree.toString());
         
     }
 }
