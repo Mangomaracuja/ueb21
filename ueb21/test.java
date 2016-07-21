@@ -2,6 +2,7 @@ package ueb21;
 
 import Exceptions.DListException;
 import Exceptions.IdentifierException;
+import Exceptions.IllegalOperationException;
 import Exceptions.NoValueInHashTableException;
 import Exceptions.StackException;
 
@@ -9,7 +10,7 @@ import Exceptions.StackException;
  * Created by niklasreinhard on 18/07/16.
  */
 public class test {
-    public static void main(String[] args) throws DListException, IdentifierException, NoValueInHashTableException, StackException {
+    public static void main(String[] args) throws DListException, IdentifierException, NoValueInHashTableException, StackException, IllegalOperationException {
         ExpressionTree expTree = new ExpressionTree();
         /*expTree.insertLeft(expTree.getRoot(), new TreeNode("Test2"));
         expTree.insertRight(expTree.getRoot(), new TreeNode("Test3"));
@@ -28,6 +29,8 @@ public class test {
         expTree.generateTree("( ( manuel * ( alex / niklas ) ) / ( guettler * ( folz - simon ) ) )", ht);
       
         System.out.print(expTree.toString());
+        
+        System.out.println(expTree.calculate());
         
     }
 }

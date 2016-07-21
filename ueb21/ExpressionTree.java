@@ -2,6 +2,7 @@ package ueb21;
 
 import Exceptions.DListException;
 import Exceptions.IdentifierException;
+import Exceptions.IllegalOperationException;
 import Exceptions.NoValueInHashTableException;
 import Exceptions.StackException;
 import java.util.NoSuchElementException;
@@ -14,6 +15,7 @@ import java.util.NoSuchElementException;
 public class ExpressionTree {
 
     private static final String MSG_UNKNOWN_IDENTIFIER = "Identifier Unbekannt!";
+    private static final String MSG_ILLEGAL_OPERATION = "Keine Gültige Rechenoperation!";
 
     private HashTabelle<String, Double> table;
     private TreeNode root;
@@ -85,6 +87,7 @@ public class ExpressionTree {
      * @throws Exceptions.NoValueInHashTableException
      * @throws Exceptions.StackException
      * @throws Exceptions.IdentifierException
+     * @throws Exceptions.DListException
      */
     public void generateTree(String ausdruck, HashTabelle tb) throws NoValueInHashTableException, StackException, IdentifierException, DListException {
         this.table = tb;
@@ -247,9 +250,40 @@ public class ExpressionTree {
      * Wertet den im Tree stehenden Ausdruck aus und gitb das Ergebnis zurück.
      *
      * @return
+     * @throws Exceptions.IllegalOperationException
      */
-    public double calculate() {
-        return 0.0;
+    public double calculate() throws IllegalOperationException {
+        return calculateInOrder(root);
+    }
+    
+    private double calculateInOrder(TreeNode localRoot) throws IllegalOperationException {
+        if (localRoot != null && checkOperator(localRoot.getKey())) {
+            double a = calculateInOrder(localRoot.getLeft());
+            double b = calculateInOrder(localRoot.getRight());
+            return calc(a, b, localRoot);
+        }
+        return table.getValue(localRoot.getKey());
+    }
+    
+    private double calc(double a, double b, TreeNode localRoot) throws IllegalOperationException {
+        double erg = 0.0;
+        switch (localRoot.getKey()){
+            case "+":
+                erg = a + b;
+                break;
+            case "-":
+                erg = a - b;
+                break;
+            case "*":
+                erg = a * b;
+                break;    
+            case "/":
+                erg = a / b;
+                break;
+            default:
+                throw new IllegalOperationException(MSG_ILLEGAL_OPERATION);
+        }
+        return erg;
     }
     
     private String hashToString(HashElement he){

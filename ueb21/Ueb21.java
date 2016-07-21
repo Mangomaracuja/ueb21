@@ -1,16 +1,19 @@
 package ueb21;
 
 import Exceptions.DListException;
+import Exceptions.IOException;
 import Exceptions.IONotFoundException;
 import Exceptions.IdentifierException;
+import Exceptions.IllegalOperationException;
 import Exceptions.NoValueInHashTableException;
 import Exceptions.StackException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.LineNumberReader;
 import java.io.File;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.*;
 
 /**
@@ -36,7 +39,7 @@ public class Ueb21 {
 
     private final ExpressionTree tree;
     private HashTabelle<String, Integer> table;
-    
+
     Scanner scanner;
 
     /**
@@ -63,18 +66,14 @@ public class Ueb21 {
     private void start() {
         try {
             File file = getFile();
-            System.out.println("\n" + file);
             createTable(file);
             analyzeFile(file);
-        } catch (IOException e) {
+        } catch (IOException | java.io.IOException e) {
             System.out.println(e);
-            System.exit(1);
-        } catch (Exception e) {
-            System.out.printf(MSG_UNKNOWN_EXCEPTION, e);
             System.exit(1);
         }
     }
-    
+
     /**
      * Funktion zum Auswerten der übergebenen Datei.
      *
@@ -82,31 +81,46 @@ public class Ueb21 {
      * @return file Rückgabewert der Datei
      * @throws DListIOException
      */
-    private File getFile() throws IOException, IONotFoundException {
+    private File getFile() {
+        File file;
         System.out.print(DATEIEINGABE);
-        String filename = scanner.next();
-        File file = new File(filename);
-        if (!file.exists()) {
-            throw new IONotFoundException(MSG_NOT_FOUND);
-        } else if (!file.isFile()) {
-            throw new IONotFoundException(MSG_NO_FILE);
-        } else if (!file.canRead()) {
-            throw new IOException(MSG_NOT_READ);
+        while (scanner.hasNextLine()) {
+            String filename = scanner.next();
+            try {
+                file = new File(filename);
+                if (!file.exists()) {
+                    throw new IONotFoundException(MSG_NOT_FOUND);
+                } else if (!file.isFile()) {
+                    throw new IONotFoundException(MSG_NO_FILE);
+                } else if (!file.canRead()) {
+                    throw new IOException(MSG_NOT_READ);
+                }
+                return file;
+            } catch (IONotFoundException e) {
+                System.out.print(e);
+            } catch (IOException e) {
+                System.out.println(e);
+                System.exit(1);
+            }
         }
-        return file;
+        System.exit(0);
+        return null;
     }
-    
+
     /**
      * Zählt die Zeilen in denen die Identifier Deklariert werden und erstell
      * dann eine Hashtabelle mit passender Länge.
-     * 
-     * @param file 
+     *
+     * @param file
      */
-    private void createTable(File file) throws FileNotFoundException, IOException {
+    private void createTable(File file) throws FileNotFoundException, IOException, java.io.IOException {
+        if (file == null) {
+            throw new IOException(MSG_NO_FILE);
+        }
         int size = 0;
         FileReader fr = new FileReader(file);
         LineNumberReader lnr = new LineNumberReader(fr);
-        while(!lnr.readLine().isEmpty()){
+        while (!lnr.readLine().isEmpty()) {
             size++;
         }
         this.table = new HashTabelle(size);
@@ -120,36 +134,39 @@ public class Ueb21 {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private void analyzeFile(File file) throws FileNotFoundException, IOException, IdentifierException, DListException, NoValueInHashTableException, StackException {
+    private void analyzeFile(File file) throws FileNotFoundException, java.io.IOException, IOException {
         int linenr = 0;
         FileReader fr = new FileReader(file);
         LineNumberReader lnr = new LineNumberReader(fr);
         String line;
-        
-        do{
-            line = lnr.readLine();
-            line = line.trim();
-            table.insertKey(line);
-            linenr++;
-        } while (!line.isEmpty());
-        
-        line = lnr.readLine();
-        linenr++;
-        tree.generateTree(line, table);
-        System.out.println(line + "\n");
-        display();
-        if(!lnr.readLine().isEmpty())
-            throw new IOException(MSG_LINE_MISSING + linenr);
-        
-        while ((line = lnr.readLine()) != null) {
-            System.out.println(line);
-            try {
+
+        try {
+            do {
+                line = lnr.readLine();
                 line = line.trim();
-                analyzeLine(line);
+                table.insertKey(line);
                 linenr++;
-            } catch (Exception e) {
-                System.out.println(e);
+            } while (!line.isEmpty());
+
+            line = lnr.readLine();
+            linenr++;
+            tree.generateTree(line, table);
+            System.out.println(line + "\n");
+            display();
+            if (!lnr.readLine().isEmpty()) {
+                throw new IOException(MSG_LINE_MISSING + linenr);
             }
+
+            while ((line = lnr.readLine()) != null) {
+                if (!line.isEmpty()) {
+                    analyzeLine(line);
+                } else {
+                    System.out.println("Symboltabelle");
+                }
+            }
+        } catch (IllegalOperationException | IdentifierException | DListException | NoValueInHashTableException | StackException e) {
+            System.out.println(e);
+            System.exit(1);
         }
     }
 
@@ -162,8 +179,8 @@ public class Ueb21 {
      *
      * @param zeile
      */
-    private void analyzeLine(String zeile) throws DListException, IdentifierException {
-        if (zeile.isEmpty()){
+    private void analyzeLine(String zeile) throws DListException, IdentifierException, IllegalOperationException {
+        if (zeile.isEmpty()) {
             System.out.println(RESULT + tree.calculate());
             display();
             return;
@@ -172,9 +189,10 @@ public class Ueb21 {
         Matcher m = r.matcher(zeile);
         if (zeile.contains(EQUALS)) {
             String key = m.group(1);
-            if(table.get(key) != null)
+            if (table.get(key) != null) {
                 throw new IdentifierException(MSG_UNKNOWN_IDENTIFIER + key);
-            
+            }
+
             int value = Integer.parseInt(m.group(2));
             table.insertValue(key, value);
         }
