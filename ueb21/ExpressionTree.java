@@ -1,15 +1,16 @@
 package ueb21;
 
 import Exceptions.NoValueInHashTableException;
+import Exceptions.StackException;
 import java.util.NoSuchElementException;
-import java.util.Stack;
 
 /**
  * Created by niklasreinhard on 18/07/16.
+ *
  * @param <T>
  */
 public class ExpressionTree<T> {
-    
+
     private HashTabelle<String, Integer> table;
 
     /*
@@ -22,7 +23,6 @@ public class ExpressionTree<T> {
         expTree.printInOrder(expTree.getRoot());
 
      */
-    
     private TreeNode<T> root;
 
     public ExpressionTree(TreeNode<T> root) {
@@ -32,137 +32,133 @@ public class ExpressionTree<T> {
 
     public ExpressionTree() {
     }
-    
-    
 
-    public TreeNode<T> getRoot(){
+    public TreeNode<T> getRoot() {
         return this.root;
     }
+
     /* inserts new TreeNode 'left' as left child of node*/
-    /* returns left TreeNode*/
-    public TreeNode<T> insertLeft(TreeNode<T> node, TreeNode<T> left){
-        if(this.root==null){
+ /* returns left TreeNode*/
+    public TreeNode<T> insertLeft(TreeNode<T> node, TreeNode<T> left) {
+        if (this.root == null) {
             root = left;
-        }{
+        }
+        {
             node.setLeft(left);
         }
         return left;
     }
+
     /* inserts new TreeNode 'right' as right child of node*/
-    /* returns right TreeNode*/
-    public TreeNode<T> insertRight(TreeNode<T> node, TreeNode<T> right){
-        if(this.root==null){
-           root = right;
-        }else{
-        node.setRight(right);
+ /* returns right TreeNode*/
+    public TreeNode<T> insertRight(TreeNode<T> node, TreeNode<T> right) {
+        if (this.root == null) {
+            root = right;
+        } else {
+            node.setRight(right);
         }
         return right;
     }
 
     /* prints Tree inOrder left-root-right*/
-    public void printInOrder(TreeNode localRoot){
+    public void printInOrder(TreeNode localRoot) {
         if (localRoot != null) {
             printInOrder(localRoot.getLeft());
             System.out.println(localRoot.toString());
             printInOrder(localRoot.getRight());
         }
     }
-    
-    public void insert(TreeNode<T> node){
-        if(root==null){
+
+    public void insert(TreeNode<T> node) {
+        if (root == null) {
             root = node;
-        }else{
+        } else {
             TreeNode current = root;
             TreeNode parent;
-            
-            while(true){
+
+            while (true) {
                 parent = current;
                 String str = (String) node.getKey();
-                if(str.compareTo((String)current.getKey())<0){
+                if (str.compareTo((String) current.getKey()) < 0) {
                     current = current.getLeft();
-                    if(current == null){
+                    if (current == null) {
                         parent.setLeft(node);
                         return;
                     }
-                }else{
+                } else {
                     current = current.getRight();
-                    if(current == null){
+                    if (current == null) {
                         parent.setRight(node);
                         return;
                     }
                 }
-                
+
             }
         }
     }
+
     /**
      * Generiert einen Baum mithilfe der Hashtabelle
-     * 
+     *
      * @param ausdruck
-     * @param tb 
-     * @throws Exceptions.NoValueInHashTableException 
+     * @param tb
+     * @throws Exceptions.NoValueInHashTableException
+     * @throws Exceptions.StackException
      */
-    public void generateTree(String ausdruck, HashTabelle tb) throws NoValueInHashTableException {
+    public void generateTree(String ausdruck, HashTabelle tb) throws NoValueInHashTableException, StackException {
         this.table = tb;
         /* parse String into operands and operators*/
         String[] parse = ausdruck.split(" ");
-        
-          
-            
-        Stack<String> optStack = new Stack();
-        Stack<TreeNode> opndStack = new Stack();
-        
-        
-        for(String s: parse){
-            if(checkOperand(s)){
+
+        Stack<String> optStack = new Stack(String.class, 100);
+        Stack<TreeNode> opndStack = new Stack(TreeNode.class, 100);
+
+        for (String s : parse) {
+            if (checkOperand(s)) {
                 TreeNode newNode = new TreeNode(s);
                 insert(newNode);
                 opndStack.push(newNode);
-            }else{
-                if(optStack.empty()){
-                    optStack.push(s);
-                }else{
-                    while(!optStack.empty()){
-                        String opTop = optStack.pop();
-                        if(opTop.equals("(")){
-                            optStack.push(s);
-                        }else if(opTop.compareTo(s)<0){ //to do schreibe eigene compare 
-                            optStack.push(s);
-                        }else{
-                            TreeNode opTopKnoten = new TreeNode(s);
-                            opTopKnoten.setRight(opndStack.pop());
-                            opTopKnoten.setLeft(opndStack.pop());
-                            opndStack.push(opTopKnoten);
-                        }
-                        if(opTop.equals("(") || opTop.compareTo(s)<0){
-                            break;
-                        }
+            } else if (optStack.empty()) {
+                optStack.push(s);
+            } else {
+                while (!optStack.empty()) {
+                    String opTop = optStack.pop();
+                    if (opTop.equals("(")) {
+                        optStack.push(s);
+                    } else if (opTop.compareTo(s) < 0) { //to do schreibe eigene compare 
+                        optStack.push(s);
+                    } else {
+                        TreeNode opTopKnoten = new TreeNode(s);
+                        opTopKnoten.setRight(opndStack.pop());
+                        opTopKnoten.setLeft(opndStack.pop());
+                        opndStack.push(opTopKnoten);
                     }
-                    optStack.push(s);
+                    if (opTop.equals("(") || opTop.compareTo(s) < 0) {
+                        break;
+                    }
                 }
+                optStack.push(s);
             }
         }
-        
-        while(!optStack.empty()){
+
+        while (!optStack.empty()) {
             String opTop = optStack.pop();
             TreeNode opTopKnoten = new TreeNode(opTop);
             opTopKnoten.setRight(opndStack.pop());
             opTopKnoten.setLeft(opndStack.pop());
             opndStack.push(opTopKnoten);
         }
-            
-        
-        
+
     }
-    
-     private int zuweisenPrioritaet(String str){
-        int rechenzeichen[] = {1,2,3};
+
+    private int zuweisenPrioritaet(String str) {
+        int rechenzeichen[] = {1, 2, 3};
         int prio = 0;
-        switch(str){
+        switch (str) {
             case "*":
                 prio = rechenzeichen[1];
                 break;
-            case "/": 
+            case "/":
                 prio = rechenzeichen[1];
                 break;
             case "+":
@@ -182,21 +178,20 @@ public class ExpressionTree<T> {
         }
         return prio;
     }
-    
-    private int compareTo(String op1, String op2){
+
+    private int compareTo(String op1, String op2) {
         int op1rang = zuweisenPrioritaet(op1);
         int op2rang = zuweisenPrioritaet(op2);
-        if(op1rang==op2rang){
+        if (op1rang == op2rang) {
             return 0;
-        }else if(op1rang>op2rang){
+        } else if (op1rang > op2rang) {
             return 1;
-        }else{
+        } else {
             return -1;
         }
     }
-    
-        /* Testen der checkOperand */
-    
+
+    /* Testen der checkOperand */
 //    public void checkOperandTest(){
 //        String str = "hallo + ( manuel * guettler )";
 //        String[] parse = str.split(" ");
@@ -205,11 +200,10 @@ public class ExpressionTree<T> {
 //            System.out.println(checkOperand(s));
 //        }
 //    }
-    
-    private boolean checkOperand(String s){
-       return !(s.equals("+") || s.equals("-") || s.equals("/") || s.equals("*") || s.equals("(") || s.equals(")"));
+    private boolean checkOperand(String s) {
+        return !(s.equals("+") || s.equals("-") || s.equals("/") || s.equals("*") || s.equals("(") || s.equals(")"));
     }
-    
+
 //    private void checkOperands(String[] operands) throws NoValueInHashTableException{
 //        /* iterate through operands array and check if operator or operand*/
 //        for (String s : operands) {
@@ -221,15 +215,12 @@ public class ExpressionTree<T> {
 //            }
 //        }
 //    }
-    
-  
-    
     /**
      * Wertet den im Tree stehenden Ausdruck aus und gitb das Ergebnis zurück.
-     * 
-     * @return 
+     *
+     * @return
      */
-    public double calculate(){
+    public double calculate() {
         return 0.0;
     }
 }
