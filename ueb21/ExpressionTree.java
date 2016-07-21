@@ -1,6 +1,7 @@
 package ueb21;
 
 import Exceptions.NoValueInHashTableException;
+import java.util.NoSuchElementException;
 import java.util.Stack;
 
 /**
@@ -152,6 +153,46 @@ public class ExpressionTree<T> {
             
         
         
+    }
+    
+     private int zuweisenPrioritaet(String str){
+        int rechenzeichen[] = {1,2,3};
+        int prio = 0;
+        switch(str){
+            case "*":
+                prio = rechenzeichen[1];
+                break;
+            case "/": 
+                prio = rechenzeichen[1];
+                break;
+            case "+":
+                prio = rechenzeichen[0];
+                break;
+            case "-":
+                prio = rechenzeichen[0];
+                break;
+            case "(":
+                prio = rechenzeichen[2];
+                break;
+            case ")":
+                prio = rechenzeichen[2];
+                break;
+            default:
+                throw new NoSuchElementException();
+        }
+        return prio;
+    }
+    
+    private int compareTo(String op1, String op2){
+        int op1rang = zuweisenPrioritaet(op1);
+        int op2rang = zuweisenPrioritaet(op2);
+        if(op1rang==op2rang){
+            return 0;
+        }else if(op1rang>op2rang){
+            return 1;
+        }else{
+            return 2;
+        }
     }
     
     private boolean checkOperand(String s){
