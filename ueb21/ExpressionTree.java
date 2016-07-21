@@ -191,15 +191,23 @@ public class ExpressionTree<T> {
         }else if(op1rang>op2rang){
             return 1;
         }else{
-            return 2;
+            return -1;
         }
     }
     
+        /* Testen der checkOperand */
+    
+//    public void checkOperandTest(){
+//        String str = "hallo + ( manuel * guettler )";
+//        String[] parse = str.split(" ");
+//        
+//        for(String s: parse){
+//            System.out.println(checkOperand(s));
+//        }
+//    }
+    
     private boolean checkOperand(String s){
-       if(s.equals("+") || s.equals("-")){
-           return false;//kein Operand
-       }
-       return true;
+       return !(s.equals("+") || s.equals("-") || s.equals("/") || s.equals("*") || s.equals("(") || s.equals(")"));
     }
     
 //    private void checkOperands(String[] operands) throws NoValueInHashTableException{

@@ -23,5 +23,6 @@ public class test {
         expTree.generateTree("hallo + ficken", ht);
       
         expTree.printInOrder(expTree.getRoot());
+        
     }
 }
