@@ -33,6 +33,6 @@ public class HashElement<K, T> {
             
     @Override
     public String toString(){
-        return null;
+        return "{"+key+": :"+wert+"}";
     }
 }

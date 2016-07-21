@@ -21,7 +21,7 @@ public class Stack<T> {
      * @param size  integer für die Länge des Arrays
      */
     public Stack(Class clazz, int size){
-        stack = (T[]) Array.newInstance(clazz, 2 );
+        stack = (T[]) Array.newInstance(clazz, size);
         size = 0;
     }
     

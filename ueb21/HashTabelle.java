@@ -18,8 +18,8 @@ public class HashTabelle<K, T> {
     private final ArrayList<HashElement<K, T>> tabelle[];
 
     public HashTabelle(int size){
-        tabelle = new ArrayList[size];
-        for(int i=0;i<size;i++){
+        tabelle = new ArrayList[size * 2];
+        for(int i=0;i<tabelle.length;i++){
             tabelle[i] = new ArrayList<>();
         }
 

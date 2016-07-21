@@ -1,5 +1,6 @@
 package ueb21;
 
+import Exceptions.DListException;
 import Exceptions.IdentifierException;
 import Exceptions.NoValueInHashTableException;
 import Exceptions.StackException;
@@ -14,7 +15,7 @@ public class ExpressionTree {
 
     private static final String MSG_UNKNOWN_IDENTIFIER = "Identifier Unbekannt!";
 
-    private HashTabelle<String, Integer> table;
+    private HashTabelle<String, Double> table;
     private TreeNode root;
 
     public ExpressionTree() {
@@ -83,8 +84,9 @@ public class ExpressionTree {
      * @param tb
      * @throws Exceptions.NoValueInHashTableException
      * @throws Exceptions.StackException
+     * @throws Exceptions.IdentifierException
      */
-    public void generateTree(String ausdruck, HashTabelle tb) throws NoValueInHashTableException, StackException, IdentifierException {
+    public void generateTree(String ausdruck, HashTabelle tb) throws NoValueInHashTableException, StackException, IdentifierException, DListException {
         this.table = tb;
         /* parse String into operands and operators*/
         String[] parse = ausdruck.split(" ");
@@ -108,6 +110,8 @@ public class ExpressionTree {
                     if (opTop.equals("(")) {
                         break;
                     } else {
+                        if(table.get(opTop) == null)
+                            table.insertKey(opTop);
                         newNode = new TreeNode(opTop);
                         newNode.setRight(opndStack.pop());
                         newNode.setLeft(opndStack.pop());
@@ -127,6 +131,8 @@ public class ExpressionTree {
                             optStack.push(opTop);
                             break;
                         } else {
+                            if(table.get(opTop) == null)
+                                table.insertKey(opTop);
                             newNode = new TreeNode(opTop);
                             newNode.setRight(opndStack.pop());
                             newNode.setLeft(opndStack.pop());
@@ -140,6 +146,8 @@ public class ExpressionTree {
 
         while (!optStack.empty()) {
             String opTop = optStack.pop();
+            if(table.get(opTop) == null)
+                table.insertKey(opTop);
             TreeNode opTopKnoten = new TreeNode(opTop);
             opTopKnoten.setRight(opndStack.pop());
             opTopKnoten.setLeft(opndStack.pop());
@@ -221,7 +229,7 @@ public class ExpressionTree {
 //        }
 //    }
     private boolean checkOperator(String s) {
-        return (s.equals("+") || s.equals("-") || s.equals("/") || s.equals("*"));
+        return (s.equals("+") || s.equals("-") || s.equals("/") || s.equals("*") || s.equals("(") || s.equals(")"));
     }
 
 //    private void checkOperands(String[] operands) throws NoValueInHashTableException{
@@ -244,21 +252,26 @@ public class ExpressionTree {
         return 0.0;
     }
     
+    private String hashToString(HashElement he){
+        return String.format("{%s: :%.2f}", he.getKey(), he.getWert());
+    }
+    
+    private void toStringInOrder(TreeNode localRoot, int i, StringBuilder sb) {
+        if (localRoot != null) {
+            toStringInOrder(localRoot.getLeft(), i+1, sb);
+            for(int j = i; j>0; j--) sb.append("|  ");
+            sb.append("+--");
+            sb.append(hashToString(table.get(localRoot.getKey())));
+            sb.append("\n");
+            toStringInOrder(localRoot.getRight(), i+1, sb);
+        }
+    }
+    
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        int i = 0;
-        TreeNode node = root;
-        while (node.getLeft() != null) {
-            node = node.getLeft();
-            sb.append("|  ");
-            i++;
-        }
-        sb.append("+--");
-        sb.append(table.get(node.getKey()).toString());
-        sb.append("\n");
-        for(;i>0;i--) sb.append("|  ");
         
+        toStringInOrder(root, 0, sb);
         
         return sb.toString();
     }

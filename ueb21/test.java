@@ -14,16 +14,37 @@ public class test {
         /*expTree.insertLeft(expTree.getRoot(), new TreeNode("Test2"));
         expTree.insertRight(expTree.getRoot(), new TreeNode("Test3"));
         expTree.printInOrder(expTree.getRoot());*/
-        HashTabelle<String,Integer> ht = new HashTabelle<>(10);
+        HashTabelle<String,Double> ht = new HashTabelle<>(10);
         
        
         
-        ht.insert("hallo", 10);
-        ht.insert("ficken", 20);
+        ht.insert("manuel", 10.0);
+        ht.insert("alex", 20.0);
+        ht.insert("niklas", 30.0);
+        ht.insert("guettler", 40.0);
+        ht.insert("folz", 50.0);
+        ht.insert("simon", 60.0);
         
-        expTree.generateTree("hallo + ficken", ht);
+        expTree.generateTree("( ( manuel * ( alex / niklas ) ) / ( guettler * ( folz - simon ) ) )", ht);
       
         System.out.print(expTree.toString());
         
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
