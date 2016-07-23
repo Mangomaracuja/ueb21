@@ -2,6 +2,9 @@ package ueb21;
 
 import Exceptions.DListException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Klasse DList. Verwaltet eine doppelt verkettete Liste mit Personen.
@@ -9,7 +12,7 @@ import java.util.Iterator;
  * @author Manuel Jung; Alexander Stolz
  * @param <T>
  */
-public class DList<T> implements Iterable{
+public class DList<T> implements Iterable<T>{
 
     private static final String MSG_LIST_EMPTY = "Liste ist leer!";
     private static final String MSG_INDEX_RANGE = "Der index ist nicht im zulässigem Bereich!";
@@ -37,12 +40,54 @@ public class DList<T> implements Iterable{
      * werden kann
      * @return 
      */
-    @Override
-    public Iterator iterator() {
+    /*@Override
+    public Iterator<T> iterator() {
         DListItr<T> itr;
         itr = new DListItr<>(head);
         return itr;
+    }*/
+    
+    /* checks, if list is empty */
+    public boolean isEmpty(){
+        return head==null;
     }
+    
+    /* returns working iterator */ 
+    @Override
+    public Iterator<T> iterator(){
+        final DList<T> liste = this;
+        return new Iterator<T>(){
+            
+            ListNode<T> first = liste.getFirst();
+            ListNode<T> current = null;
+            
+            @Override
+            public boolean hasNext() {
+                if(liste.isEmpty()){
+                    return false;
+                }else if(current==null){
+                    return true;
+                }else if(current==liste.getLast()){
+                    return false;
+                }
+                return true;
+            }
+
+            @Override
+            public T next() {
+                if(liste.isEmpty()){
+                    throw new NoSuchElementException();
+                }else if(current == null){
+                    this.current = first;
+                    return current.getItem();
+                }else if(current.getNext()==null){
+                   throw new NoSuchElementException();
+                }
+                this.current = current.getNext();
+                return current.getItem();
+            }
+        };
+    }    
 
     /**
      * gibt die Referenz auf das index-te Element zurück
@@ -179,12 +224,15 @@ public class DList<T> implements Iterable{
      * @return Erstes Element.
      * @throws Exceptions.DListException
      */
-    public T getFirst() throws DListException {
-        if (size == 0) {
-            throw new DListException(MSG_LIST_EMPTY);
+    public ListNode<T> getFirst(){
+       if (size == 0) {
+           try {
+               throw new DListException(MSG_LIST_EMPTY);
+           } catch (DListException ex) {
+               Logger.getLogger(DList.class.getName()).log(Level.SEVERE, null, ex);
+           }
         }
-
-        return head.getItem();
+        return this.head;
     }
 
     /**
@@ -193,11 +241,15 @@ public class DList<T> implements Iterable{
      * @return Letztes Element.
      * @throws Exceptions.DListException
      */
-    public T getLast() throws DListException {
+    public ListNode<T> getLast() {
         if (size == 0) {
-            throw new DListException(MSG_LIST_EMPTY);
+            try {
+                throw new DListException(MSG_LIST_EMPTY);
+            } catch (DListException ex) {
+                Logger.getLogger(DList.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        return tail.getItem();
+        return this.tail;
     }
 
     /**
