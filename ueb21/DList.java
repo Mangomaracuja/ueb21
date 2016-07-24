@@ -58,7 +58,9 @@ public class DList<T> implements Iterable<T>{
         final DList<T> liste = this;
         return new Iterator<T>(){
             
+            
             ListNode<T> first = liste.getFirst();
+            
             ListNode<T> current = null;
             
             @Override

@@ -15,12 +15,12 @@ public class HashTabelle<K, T> {
     private static final String MSG_NOSUCHELEMENT = " Element existiert nicht";
     private static final String MSG_ALREADYEXISTS = " Element existiert bereits";
 
-    private final ArrayList<HashElement<K, T>> tabelle[];
+    private final DList<HashElement<K, T>> tabelle[];
 
     public HashTabelle(int size){
-        tabelle = new ArrayList[size * 2];
+        tabelle = new DList[size * 2];
         for(int i=0;i<tabelle.length;i++){
-            tabelle[i] = new ArrayList<>();
+            tabelle[i] = new DList<>();
         }
 
     }
@@ -45,11 +45,12 @@ public class HashTabelle<K, T> {
 
     public HashElement get(K key){
         int hash = hashing(key);
-
-        for (HashElement<K,T> he : tabelle[hash]) {
+        if(!tabelle[hash].isEmpty()){
+            for (HashElement<K,T> he : tabelle[hash]) {
             if(he.getKey().equals(key)){
                return he;
             }
+          }
         }
         return null;
     }
@@ -67,11 +68,11 @@ public class HashTabelle<K, T> {
         return null;
     }
     
-    public void remove(K key) {
+    public void remove(K key) throws DListException {
         int hash = hashing(key);
         for (HashElement<K, T> he : tabelle[hash]) {
             if (he.getKey().equals(key)) {
-                tabelle[hash].remove(key);
+                tabelle[hash].remove(he);
                 return;
             }
         }
