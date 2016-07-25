@@ -195,8 +195,6 @@ public class Ueb21 {
         }
         Pattern r = Pattern.compile(REGEX);
 
-        while (input.hasNext()) {
-            String in = input.nextLine();
             Matcher m = r.matcher(zeile);
             if (m.find()) {
                 String key = m.group(1);
