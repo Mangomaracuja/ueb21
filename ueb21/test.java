@@ -5,7 +5,6 @@ import Exceptions.IdentifierException;
 import Exceptions.IllegalOperationException;
 import Exceptions.NoValueInHashTableException;
 import Exceptions.StackException;
-import java.util.Iterator;
 
 /**
  * Created by niklasreinhard on 18/07/16.
@@ -17,7 +16,7 @@ public class test {
 //        /*expTree.insertLeft(expTree.getRoot(), new TreeNode("Test2"));
 //        expTree.insertRight(expTree.getRoot(), new TreeNode("Test3"));
 //        expTree.printInOrder(expTree.getRoot());*/
-          HashTabelle<String,Double> ht = new HashTabelle<>(10);
+          HashTabelle<String,Double> ht = new HashTabelle<>(20);
 //        
 //       
 //        

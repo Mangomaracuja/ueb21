@@ -17,7 +17,7 @@ public class HashTabelle<K, T> {
     private final DList<HashElement<K, T>> tabelle[];
 
     public HashTabelle(int size){
-        tabelle = new DList[size * 2];
+        tabelle = new DList[size];
         for(int i=0;i<tabelle.length;i++){
             tabelle[i] = new DList<>();
         }

@@ -126,7 +126,7 @@ public class Ueb21 {
         while (!lnr.readLine().isEmpty()) {
             size++;
         }
-        this.table = new HashTabelle(size);
+        this.table = new HashTabelle(size*2);
     }
 
     /**
