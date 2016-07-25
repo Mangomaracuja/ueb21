@@ -39,7 +39,7 @@ public class Ueb21 {
     private static final String REGEX = "(.+?)\\s=\\s(.+?)";
 
     private final ExpressionTree tree;
-    private HashTabelle<String, Integer> table;
+    private HashTabelle<String, Double> table;
 
     Scanner scanner;
 
@@ -164,6 +164,7 @@ public class Ueb21 {
             while ((line = lnr.readLine()) != null) {
                 analyzeLine(line);
             }
+            analyzeLine("");
         } catch (IllegalOperationException | IdentifierException |
                 DListException | NoValueInHashTableException |
                 StackException e) {
@@ -188,26 +189,28 @@ public class Ueb21 {
             System.out.println(table.toString());
             System.out.println(BEFORECALC);
             display();
-            System.out.println(RESULT + tree.calculate());
+            System.out.println(RESULT + tree.calculate() + "\n");
             System.out.println(AFTERCALC);
             display();
             return;
         }
+        
+        String key = null;
+        String value = null;
         Pattern r = Pattern.compile(REGEX);
+        Matcher m = r.matcher(zeile);
+        if (m.find()) {
+            key = m.group(1);
+            value = m.group(2);
 
-            Matcher m = r.matcher(zeile);
-            if (m.find()) {
-                String key = m.group(1);
-                String value = m.group(2);
-
-            }
-            if (table.get(key) != null) {
-                throw new IdentifierException(MSG_UNKNOWN_IDENTIFIER + key);
-            }
-
-            int value = Integer.parseInt(m.group(2));
-            table.insertValue(key, value);
         }
+        if (table.get(key) == null) {
+            throw new IdentifierException(MSG_UNKNOWN_IDENTIFIER + key);
+        }
+        System.out.println(key + ": " + value);
+        double dvalue = Double.parseDouble(value);
+        table.insertValue(key, dvalue);
+
     }
 
     /**
@@ -215,6 +218,6 @@ public class Ueb21 {
      *
      */
     private void display() {
-        System.out.println(tree.toString() + "\n");
+        System.out.println(tree.toString());
     }
 }
