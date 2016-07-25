@@ -36,7 +36,6 @@ public class Ueb21 {
     private static final String BEFORECALC = "ExpressionTree bevor der Berechnung:";
     private static final String AFTERCALC = "ExpressionTree nach der Berechnung:";
     private static final String WITHOUTVALUES = "ExpressionTree ohne Werte:";
-    private static final String EQUALS = " = ";
     private static final String REGEX = "(.+?)\\s=\\s(.+?)";
 
     private final ExpressionTree tree;
@@ -115,7 +114,7 @@ public class Ueb21 {
      *
      * @param file
      */
-    private void createTable(File file) throws FileNotFoundException, 
+    private void createTable(File file) throws FileNotFoundException,
             IOException, java.io.IOException {
         if (file == null) {
             throw new IOException(MSG_NO_FILE);
@@ -126,7 +125,7 @@ public class Ueb21 {
         while (!lnr.readLine().isEmpty()) {
             size++;
         }
-        this.table = new HashTabelle(size*2);
+        this.table = new HashTabelle(size * 2);
     }
 
     /**
@@ -137,7 +136,7 @@ public class Ueb21 {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private void analyzeFile(File file) throws FileNotFoundException, 
+    private void analyzeFile(File file) throws FileNotFoundException,
             java.io.IOException, IOException {
         int linenr = 0;
         FileReader fr = new FileReader(file);
@@ -163,10 +162,10 @@ public class Ueb21 {
             }
 
             while ((line = lnr.readLine()) != null) {
-                    analyzeLine(line);
+                analyzeLine(line);
             }
-        } catch (IllegalOperationException | IdentifierException | 
-                DListException | NoValueInHashTableException | 
+        } catch (IllegalOperationException | IdentifierException |
+                DListException | NoValueInHashTableException |
                 StackException e) {
             System.out.println(e);
             System.exit(1);
@@ -182,7 +181,7 @@ public class Ueb21 {
      *
      * @param zeile
      */
-    private void analyzeLine(String zeile) throws DListException, 
+    private void analyzeLine(String zeile) throws DListException,
             IdentifierException, IllegalOperationException {
         if (zeile.isEmpty()) {
             System.out.println(SYMBOLTABLE);
@@ -195,9 +194,15 @@ public class Ueb21 {
             return;
         }
         Pattern r = Pattern.compile(REGEX);
-        Matcher m = r.matcher(zeile);
-        if (zeile.contains(EQUALS)) {
-            String key = m.group(1);
+
+        while (input.hasNext()) {
+            String in = input.nextLine();
+            Matcher m = r.matcher(zeile);
+            if (m.find()) {
+                String key = m.group(1);
+                String value = m.group(2);
+
+            }
             if (table.get(key) != null) {
                 throw new IdentifierException(MSG_UNKNOWN_IDENTIFIER + key);
             }
