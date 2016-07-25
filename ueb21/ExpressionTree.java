@@ -113,12 +113,12 @@ public class ExpressionTree {
                     if (opTop.equals("(")) {
                         break;
                     } else {
-                        if(table.get(opTop) == null)
-                            table.insertKey(opTop);
                         newNode = new TreeNode(opTop);
                         newNode.setRight(opndStack.pop());
                         newNode.setLeft(opndStack.pop());
                         opndStack.push(newNode);
+                        if (table.get(opTop + newNode.toStringSuper()) == null)
+                            table.insertKey(opTop + newNode.toStringSuper());
                     }
                 }
             } else if (checkOperator(s)) {
@@ -134,12 +134,12 @@ public class ExpressionTree {
                             optStack.push(opTop);
                             break;
                         } else {
-                            if(table.get(opTop) == null)
-                                table.insertKey(opTop);
                             newNode = new TreeNode(opTop);
                             newNode.setRight(opndStack.pop());
                             newNode.setLeft(opndStack.pop());
                             opndStack.push(newNode);
+                            if (table.get(opTop + newNode.toStringSuper()) == null)
+                            table.insertKey(opTop + newNode.toStringSuper());
                         }
                     }
                     optStack.push(s);
@@ -149,37 +149,15 @@ public class ExpressionTree {
 
         while (!optStack.empty()) {
             String opTop = optStack.pop();
-            if(table.get(opTop) == null)
-                table.insertKey(opTop);
             TreeNode opTopKnoten = new TreeNode(opTop);
             opTopKnoten.setRight(opndStack.pop());
             opTopKnoten.setLeft(opndStack.pop());
             opndStack.push(opTopKnoten);
+            if (table.get(opTop + opTopKnoten.toStringSuper()) == null)
+                            table.insertKey(opTop + opTopKnoten.toStringSuper());
         }
         
         root = opndStack.pop();
-
-        //            else if (optStack.empty()) {
-        //                optStack.push(s);
-        //            } else {
-        //                while (!optStack.empty()) {
-        //                    String opTop = optStack.pop();
-        //                    if (opTop.equals("(")) {
-        //                        optStack.push(s);
-        //                    } else if (opTop.compareTo(s) < 0) { //to do schreibe eigene compare 
-        //                        optStack.push(s);
-        //                    } else {
-        //                        TreeNode opTopKnoten = new TreeNode(s);
-        //                        opTopKnoten.setRight(opndStack.pop());
-        //                        opTopKnoten.setLeft(opndStack.pop());
-        //                        opndStack.push(opTopKnoten);
-        //                    }
-        //                    if (opTop.equals("(") || opTop.compareTo(s) < 0) {
-        //                        break;
-        //                    }
-        //                }
-        //                optStack.push(s);
-        //            }
     }
 
     private int zuweisenPrioritaet(String str) {
@@ -222,62 +200,45 @@ public class ExpressionTree {
         }
     }
 
-    /* Testen der checkOperand */
-//    public void checkOperandTest(){
-//        String str = "hallo + ( manuel * guettler )";
-//        String[] parse = str.split(" ");
-//        
-//        for(String s: parse){
-//            System.out.println(checkOperand(s));
-//        }
-//    }
     private boolean checkOperator(String s) {
         return (s.equals("+") || s.equals("-") || s.equals("/") || s.equals("*") || s.equals("(") || s.equals(")"));
     }
 
-//    private void checkOperands(String[] operands) throws NoValueInHashTableException{
-//        /* iterate through operands array and check if operator or operand*/
-//        for (String s : operands) {
-//            /* if parse[i] is no operator, check if corresponding value is stored in hashtable*/
-//            if (!checkOperator(s)) {
-//                if (table.getValue(s) == null) {
-//                    throw new NoValueInHashTableException("Kein zugehöriger Wert in HashTabelle gespeichert");   
-//                }
-//            }
-//        }
-//    }
     /**
      * Wertet den im Tree stehenden Ausdruck aus und gitb das Ergebnis zurück.
      *
      * @return
      * @throws Exceptions.IllegalOperationException
+     * @throws Exceptions.IdentifierException
      */
-    public double calculate() throws IllegalOperationException {
+    public double calculate() throws IllegalOperationException, IdentifierException {
         return calculateInOrder(root);
     }
     
-    private double calculateInOrder(TreeNode localRoot) throws IllegalOperationException {
-        if (localRoot != null && checkOperator(localRoot.getKey())) {
+    private double calculateInOrder(TreeNode localRoot) throws IllegalOperationException, IdentifierException {
+        if (localRoot != null && checkOperator(localRoot.getKey().substring(0, 1))) {
             double a = calculateInOrder(localRoot.getLeft());
             double b = calculateInOrder(localRoot.getRight());
-            return calc(a, b, localRoot);
+            double erg = calc(a, b, localRoot);
+            table.insertValue(localRoot.getKey() + localRoot.toStringSuper(), erg);
+            return erg;
         }
         return table.getValue(localRoot.getKey());
     }
     
     private double calc(double a, double b, TreeNode localRoot) throws IllegalOperationException {
         double erg = 0.0;
-        switch (localRoot.getKey()){
-            case "+":
+        switch (localRoot.getKey().charAt(0)){
+            case '+':
                 erg = a + b;
                 break;
-            case "-":
+            case '-':
                 erg = a - b;
                 break;
-            case "*":
+            case '*':
                 erg = a * b;
                 break;    
-            case "/":
+            case '/':
                 erg = a / b;
                 break;
             default:
@@ -286,16 +247,21 @@ public class ExpressionTree {
         return erg;
     }
     
-    private String hashToString(HashElement he){
+    private String hashToString(HashElement<String, Double> he){
+        if (checkOperator(he.getKey().substring(0, 1)))
+            return String.format("{%s: :%.2f}", he.getKey().charAt(0), he.getWert());
         return String.format("{%s: :%.2f}", he.getKey(), he.getWert());
     }
-    
+   
     private void toStringInOrder(TreeNode localRoot, int i, StringBuilder sb) {
         if (localRoot != null) {
             toStringInOrder(localRoot.getLeft(), i+1, sb);
             for(int j = i; j>0; j--) sb.append("|  ");
             sb.append("+--");
-            sb.append(hashToString(table.get(localRoot.getKey())));
+            if (checkOperator(localRoot.getKey()))
+                sb.append(hashToString(table.get(localRoot.getKey() + localRoot.toStringSuper())));
+            else
+                sb.append(hashToString(table.get(localRoot.getKey())));
             sb.append("\n");
             toStringInOrder(localRoot.getRight(), i+1, sb);
         }

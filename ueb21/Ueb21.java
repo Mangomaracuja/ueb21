@@ -12,8 +12,6 @@ import java.io.FileNotFoundException;
 import java.io.LineNumberReader;
 import java.io.File;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.*;
 
 /**
@@ -34,6 +32,10 @@ public class Ueb21 {
     private static final String MSG_UNKNOWN_IDENTIFIER = "Identifier Unbekannt!";
     private static final String DATEIEINGABE = "Name der Eingabedatei oder Return-Taste zum Beenden => ";
     private static final String RESULT = "Ergebnis: ";
+    private static final String SYMBOLTABLE = "Symboltabelle:";
+    private static final String BEFORECALC = "ExpressionTree bevor der Berechnung:";
+    private static final String AFTERCALC = "ExpressionTree nach der Berechnung:";
+    private static final String WITHOUTVALUES = "ExpressionTree ohne Werte:";
     private static final String EQUALS = " = ";
     private static final String REGEX = "(.+?)\\s=\\s(.+?)";
 
@@ -87,7 +89,7 @@ public class Ueb21 {
         while (scanner.hasNextLine()) {
             String filename = scanner.next();
             try {
-                file = new File(filename);
+                file = new File("/home/manuel/TestFile.txt");
                 if (!file.exists()) {
                     throw new IONotFoundException(MSG_NOT_FOUND);
                 } else if (!file.isFile()) {
@@ -113,7 +115,8 @@ public class Ueb21 {
      *
      * @param file
      */
-    private void createTable(File file) throws FileNotFoundException, IOException, java.io.IOException {
+    private void createTable(File file) throws FileNotFoundException, 
+            IOException, java.io.IOException {
         if (file == null) {
             throw new IOException(MSG_NO_FILE);
         }
@@ -134,7 +137,8 @@ public class Ueb21 {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    private void analyzeFile(File file) throws FileNotFoundException, java.io.IOException, IOException {
+    private void analyzeFile(File file) throws FileNotFoundException, 
+            java.io.IOException, IOException {
         int linenr = 0;
         FileReader fr = new FileReader(file);
         LineNumberReader lnr = new LineNumberReader(fr);
@@ -152,19 +156,18 @@ public class Ueb21 {
             linenr++;
             tree.generateTree(line, table);
             System.out.println(line + "\n");
+            System.out.println(WITHOUTVALUES);
             display();
             if (!lnr.readLine().isEmpty()) {
                 throw new IOException(MSG_LINE_MISSING + linenr);
             }
 
             while ((line = lnr.readLine()) != null) {
-                if (!line.isEmpty()) {
                     analyzeLine(line);
-                } else {
-                    System.out.println("Symboltabelle");
-                }
             }
-        } catch (IllegalOperationException | IdentifierException | DListException | NoValueInHashTableException | StackException e) {
+        } catch (IllegalOperationException | IdentifierException | 
+                DListException | NoValueInHashTableException | 
+                StackException e) {
             System.out.println(e);
             System.exit(1);
         }
@@ -179,9 +182,15 @@ public class Ueb21 {
      *
      * @param zeile
      */
-    private void analyzeLine(String zeile) throws DListException, IdentifierException, IllegalOperationException {
+    private void analyzeLine(String zeile) throws DListException, 
+            IdentifierException, IllegalOperationException {
         if (zeile.isEmpty()) {
+            System.out.println(SYMBOLTABLE);
+            System.out.println(table.toString());
+            System.out.println(BEFORECALC);
+            display();
             System.out.println(RESULT + tree.calculate());
+            System.out.println(AFTERCALC);
             display();
             return;
         }

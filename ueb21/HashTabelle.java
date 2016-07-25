@@ -2,7 +2,6 @@ package ueb21;
 
 import Exceptions.DListException;
 import Exceptions.IdentifierException;
-import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 /**

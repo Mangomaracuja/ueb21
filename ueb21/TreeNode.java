@@ -56,6 +56,10 @@ public class TreeNode {
         }
         return false;
     }
+    
+    public String toStringSuper() {
+        return super.toString();
+    }
 
     @Override
     public String toString() {
