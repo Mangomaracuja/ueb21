@@ -7,10 +7,11 @@ package ueb21;
  * @param <K>
  */
 public class HashElement<K, T> {
+
     private T wert;
     private K key;
-    
-    public HashElement(K key, T wert){
+
+    public HashElement(K key, T wert) {
         this.wert = wert;
         this.key = key;
     }
@@ -30,9 +31,9 @@ public class HashElement<K, T> {
     public void setWert(T wert) {
         this.wert = wert;
     }
-            
+
     @Override
-    public String toString(){
-        return "{"+key+": :"+wert+"}";
+    public String toString() {
+        return "{" + key + ": :" + wert + "}";
     }
 }

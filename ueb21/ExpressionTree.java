@@ -8,9 +8,8 @@ import Exceptions.StackException;
 import java.util.NoSuchElementException;
 
 /**
- * Created by niklasreinhard on 18/07/16.
- *
  * 
+ * @author Manuel Jung; Alexander Stolz; Niklas Reinhard;
  */
 public class ExpressionTree {
 
@@ -20,6 +19,10 @@ public class ExpressionTree {
     private HashTabelle<String, Double> table;
     private TreeNode root;
 
+    /**
+     * StandardKonstruktor.
+     *
+     */
     public ExpressionTree() {
         this.root = null;
     }
@@ -28,59 +31,8 @@ public class ExpressionTree {
         return this.root;
     }
 
-    /* inserts new TreeNode 'left' as left child of node*/
- /* returns left TreeNode*/
-    public TreeNode insertLeft(TreeNode node, TreeNode left) {
-        if (this.root == null) {
-            root = left;
-        }
-        {
-            node.setLeft(left);
-        }
-        return left;
-    }
-
-    /* inserts new TreeNode 'right' as right child of node*/
- /* returns right TreeNode*/
-    public TreeNode insertRight(TreeNode node, TreeNode right) {
-        if (this.root == null) {
-            root = right;
-        } else {
-            node.setRight(right);
-        }
-        return right;
-    }
-
-    public void insert(TreeNode node) {
-        if (root == null) {
-            root = node;
-        } else {
-            TreeNode current = root;
-            TreeNode parent;
-
-            while (true) {
-                parent = current;
-                String str = (String) node.getKey();
-                if (str.compareTo((String) current.getKey()) < 0) {
-                    current = current.getLeft();
-                    if (current == null) {
-                        parent.setLeft(node);
-                        return;
-                    }
-                } else {
-                    current = current.getRight();
-                    if (current == null) {
-                        parent.setRight(node);
-                        return;
-                    }
-                }
-
-            }
-        }
-    }
-
     /**
-     * Generiert einen Baum mithilfe der Hashtabelle
+     * Generiert einen Baum mithilfe der Hashtabelle.
      *
      * @param ausdruck
      * @param tb
@@ -117,8 +69,9 @@ public class ExpressionTree {
                         newNode.setRight(opndStack.pop());
                         newNode.setLeft(opndStack.pop());
                         opndStack.push(newNode);
-                        if (table.get(opTop + newNode.toStringSuper()) == null)
+                        if (table.get(opTop + newNode.toStringSuper()) == null) {
                             table.insertKey(opTop + newNode.toStringSuper());
+                        }
                     }
                 }
             } else if (checkOperator(s)) {
@@ -138,8 +91,9 @@ public class ExpressionTree {
                             newNode.setRight(opndStack.pop());
                             newNode.setLeft(opndStack.pop());
                             opndStack.push(newNode);
-                            if (table.get(opTop + newNode.toStringSuper()) == null)
-                            table.insertKey(opTop + newNode.toStringSuper());
+                            if (table.get(opTop + newNode.toStringSuper()) == null) {
+                                table.insertKey(opTop + newNode.toStringSuper());
+                            }
                         }
                     }
                     optStack.push(s);
@@ -153,13 +107,20 @@ public class ExpressionTree {
             opTopKnoten.setRight(opndStack.pop());
             opTopKnoten.setLeft(opndStack.pop());
             opndStack.push(opTopKnoten);
-            if (table.get(opTop + opTopKnoten.toStringSuper()) == null)
-                            table.insertKey(opTop + opTopKnoten.toStringSuper());
+            if (table.get(opTop + opTopKnoten.toStringSuper()) == null) {
+                table.insertKey(opTop + opTopKnoten.toStringSuper());
+            }
         }
-        
+
         root = opndStack.pop();
     }
 
+    /**
+     * Methode zum zuweisen einer Priortät eines Operators.
+     *
+     * @param str
+     * @return
+     */
     private int zuweisenPrioritaet(String str) {
         int rechenzeichen[] = {1, 2, 3};
         int prio = 0;
@@ -188,6 +149,14 @@ public class ExpressionTree {
         return prio;
     }
 
+    /**
+     * Vergleicht zwei Operatoren mit ihrer Wertigkeit und gibgt einen Integer
+     * zurück. 0 bei identisch. -1 wenn op1 kleiner op2. +1 wenn op1 größer op2.
+     *
+     * @param op1
+     * @param op2
+     * @return
+     */
     private int compareTo(String op1, String op2) {
         int op1rang = zuweisenPrioritaet(op1);
         int op2rang = zuweisenPrioritaet(op2);
@@ -200,6 +169,12 @@ public class ExpressionTree {
         }
     }
 
+    /**
+     * Methode zum Überprüfen ob das übergebene String ein Operator ist.
+     *
+     * @param s
+     * @return
+     */
     private boolean checkOperator(String s) {
         return (s.equals("+") || s.equals("-") || s.equals("/") || s.equals("*") || s.equals("(") || s.equals(")"));
     }
@@ -214,7 +189,15 @@ public class ExpressionTree {
     public double calculate() throws IllegalOperationException, IdentifierException {
         return calculateInOrder(root);
     }
-    
+
+    /**
+     * Methode zum Berechnen des Trees inOrder rekursiv.
+     *
+     * @param localRoot
+     * @return
+     * @throws IllegalOperationException
+     * @throws IdentifierException
+     */
     private double calculateInOrder(TreeNode localRoot) throws IllegalOperationException, IdentifierException {
         if (localRoot != null && checkOperator(localRoot.getKey().substring(0, 1))) {
             double a = calculateInOrder(localRoot.getLeft());
@@ -225,10 +208,20 @@ public class ExpressionTree {
         }
         return table.getValue(localRoot.getKey());
     }
-    
+
+    /**
+     * Methode zum unterscheiden der Verschiedenen Operatoren und berechet diese
+     * dann.
+     *
+     * @param a
+     * @param b
+     * @param localRoot
+     * @return
+     * @throws IllegalOperationException
+     */
     private double calc(double a, double b, TreeNode localRoot) throws IllegalOperationException {
         double erg = 0.0;
-        switch (localRoot.getKey().charAt(0)){
+        switch (localRoot.getKey().charAt(0)) {
             case '+':
                 erg = a + b;
                 break;
@@ -237,7 +230,7 @@ public class ExpressionTree {
                 break;
             case '*':
                 erg = a * b;
-                break;    
+                break;
             case '/':
                 erg = a / b;
                 break;
@@ -246,33 +239,51 @@ public class ExpressionTree {
         }
         return erg;
     }
-    
-    private String hashToString(HashElement<String, Double> he){
-        if (checkOperator(he.getKey().substring(0, 1)))
-            return String.format("{%s: :%.2f}", he.getKey().charAt(0), he.getWert());
-        return String.format("{%s: :%.2f}", he.getKey(), he.getWert());
+
+    /**
+     * Formattiert ein Hashelement in ein String und gibt diesen zurück.
+     *
+     * @param he
+     * @return
+     */
+    private String hashToString(HashElement<String, Double> he) {
+        if (checkOperator(he.getKey().substring(0, 1))) {
+            return String.format("{%s: :%.10s}", he.getKey().charAt(0), he.getWert());
+        }
+        return String.format("{%s: :%.10s}", he.getKey(), he.getWert());
     }
-   
+
+    /**
+     * Formattiert den gesamtern Tree mithilfe eines StringBuilders, der
+     * übergeben wird.
+     *
+     * @param localRoot
+     * @param i
+     * @param sb
+     */
     private void toStringInOrder(TreeNode localRoot, int i, StringBuilder sb) {
         if (localRoot != null) {
-            toStringInOrder(localRoot.getLeft(), i+1, sb);
-            for(int j = i; j>0; j--) sb.append("|  ");
+            toStringInOrder(localRoot.getLeft(), i + 1, sb);
+            for (int j = i; j > 0; j--) {
+                sb.append("|  ");
+            }
             sb.append("+--");
-            if (checkOperator(localRoot.getKey()))
+            if (checkOperator(localRoot.getKey())) {
                 sb.append(hashToString(table.get(localRoot.getKey() + localRoot.toStringSuper())));
-            else
+            } else {
                 sb.append(hashToString(table.get(localRoot.getKey())));
+            }
             sb.append("\n");
-            toStringInOrder(localRoot.getRight(), i+1, sb);
+            toStringInOrder(localRoot.getRight(), i + 1, sb);
         }
     }
-    
+
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder sb = new StringBuilder();
-        
+
         toStringInOrder(root, 0, sb);
-        
+
         return sb.toString();
     }
 }

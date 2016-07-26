@@ -139,7 +139,9 @@ public class Ueb21 {
             do {
                 line = lnr.readLine();
                 line = line.trim();
-                table.insertKey(line);
+                if (!line.isEmpty()) {
+                    table.insertKey(line);
+                }
                 linenr++;
             } while (!line.isEmpty());
 
@@ -186,7 +188,7 @@ public class Ueb21 {
             display();
             return;
         }
-        
+
         String[] parse = zeile.split(" ");
         table.insertValue(parse[0], Double.parseDouble(parse[2]));
     }

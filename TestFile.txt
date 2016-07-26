@@ -1,10 +1,6 @@
 AAAA
 VarB
 xx12A
-edf
-gjhhg
-frth
-jkug
 
 AAAA + VarB + xx12A
 

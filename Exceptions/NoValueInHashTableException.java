@@ -2,7 +2,7 @@ package Exceptions;
 
 /**
  *
- * @author manuel
+ * @author Manuel Jung; Alexander Stolz; Niklas Reinhard;
  */
 public class NoValueInHashTableException extends Exception {
 

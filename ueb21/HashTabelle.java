@@ -59,7 +59,7 @@ public class HashTabelle<K, T> {
 
     public T getValue(K key) {
         int hash = hashing(key);
-        T erg = null;
+        T erg;
 
         for (HashElement<K, T> he : tabelle[hash]) {
             if (he.getKey().equals(key)) {
@@ -113,6 +113,7 @@ public class HashTabelle<K, T> {
                 sb.append(hashing(list.getFirst().getItem().getKey()));
                 sb.append(": ");
                 for (HashElement<K, T> he : list) {
+                    sb.append(" <-> ");
                     sb.append(he.toString());
                 }
                 sb.append("\n");
