@@ -12,7 +12,6 @@ import java.io.FileNotFoundException;
 import java.io.LineNumberReader;
 import java.io.File;
 import java.util.Scanner;
-import java.util.regex.*;
 
 /**
  *
@@ -195,22 +194,8 @@ public class Ueb21 {
             return;
         }
         
-        String key = null;
-        String value = null;
-        Pattern r = Pattern.compile(REGEX);
-        Matcher m = r.matcher(zeile);
-        if (m.find()) {
-            key = m.group(1);
-            value = m.group(2);
-
-        }
-        if (table.get(key) == null) {
-            throw new IdentifierException(MSG_UNKNOWN_IDENTIFIER + key);
-        }
-        System.out.println(key + ": " + value);
-        double dvalue = Double.parseDouble(value);
-        table.insertValue(key, dvalue);
-
+        String[] parse = zeile.split(" ");
+        table.insertValue(parse[0], Double.parseDouble(parse[2]));
     }
 
     /**
