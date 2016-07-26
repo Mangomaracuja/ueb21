@@ -20,23 +20,16 @@ import java.util.Scanner;
 public class Ueb21 {
 
     /*Variablen Deklaration*/
-    private static final String MSG_NO_ARGUMENTS = "Keine Argumente übergeben!";
-    private static final String MSG_UNKNOWN_EXCEPTION = "Ein unerwarteter Fehler ist aufgetreten:\n%s\n";
-    private static final String MSG_UNKNOWN_IOEXCEPTION = "Ein unerwarteter IOFehler ist aufgetreten:\n%s\n";
     private static final String MSG_NOT_FOUND = "Datei konnte nicht gefunden werden!";
-    private static final String MSG_NAME_NOT_FOUND = "Element konnte nicht gefunden werden";
     private static final String MSG_NO_FILE = "Ist keine einfache Datei!";
     private static final String MSG_NOT_READ = "Datei ist nicht lesbar";
     private static final String MSG_LINE_MISSING = "Erwartete Leerzeile fehlt!";
-    private static final String MSG_UNKNOWN_IDENTIFIER = "Identifier Unbekannt!";
     private static final String DATEIEINGABE = "Name der Eingabedatei oder Return-Taste zum Beenden => ";
     private static final String RESULT = "Ergebnis: ";
     private static final String SYMBOLTABLE = "Symboltabelle:";
     private static final String BEFORECALC = "ExpressionTree bevor der Berechnung:";
     private static final String AFTERCALC = "ExpressionTree nach der Berechnung:";
     private static final String WITHOUTVALUES = "ExpressionTree ohne Werte:";
-    private static final String REGEX = "(.+?)\\s=\\s(.+?)";
-
     private final ExpressionTree tree;
     private HashTabelle<String, Double> table;
 
@@ -87,7 +80,7 @@ public class Ueb21 {
         while (scanner.hasNextLine()) {
             String filename = scanner.next();
             try {
-                file = new File("/home/manuel/TestFile.txt");
+                file = new File(filename);
                 if (!file.exists()) {
                     throw new IONotFoundException(MSG_NOT_FOUND);
                 } else if (!file.isFile()) {
